@@ -9,7 +9,8 @@
 
 ## 🚀 Live Demo
 
-👉 **Try the deployed model here:**  [🔗](https://huggingface.co/spaces/sahilalam75/dl-project-audio-classification) 
+👉 **Try the deployed model here:**  
+🔗 https://huggingface.co/spaces/sahilalam75/dl-project-audio-classification  
 
 Upload an audio clip and get instant genre predictions.
 
@@ -64,7 +65,19 @@ messy_mashup/
 
 ---
 
-## 🎼 Genres
+## 🎼 Training Data — `genres_stems/`
+
+- 10 genres  
+- 100 songs per genre  
+- Each song split into 4 stems:
+    1. drums.wav
+    2. vocals.wav
+    3. bass.wav
+    4. other.wav
+
+---
+
+## 🎵 Genres
 
 - blues  
 - classical  
@@ -76,6 +89,28 @@ messy_mashup/
 - pop  
 - reggae  
 - rock  
+
+---
+
+## 🔊 Noise Dataset — `ESC-50-master/`
+
+- 2,000 environmental sound clips  
+- 50 labeled sound classes  
+- Used for noise augmentation and robustness training  
+
+---
+
+## 🎚 Test Set — `mashups/`
+
+- 3,020 unlabeled audio files  
+- Each mashup is created by:
+
+  - Selecting stems from different songs of the same genre  
+  - Applying tempo synchronization  
+  - Mixing stems into a single audio track  
+  - Adding one or more random noise samples  
+
+These mashups are intentionally noisy and musically varied, making genre classification significantly more challenging.
 
 ---
 
