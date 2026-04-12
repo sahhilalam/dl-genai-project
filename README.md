@@ -1,4 +1,5 @@
-# 🎵 Messy Mashup — Robust Music Genre Classification [🔗](https://www.kaggle.com/competitions/jan-2026-dl-gen-ai-project/)
+# 🎵 Messy Mashup — Robust Music Genre Classification  
+[🔗 Kaggle Competition](https://www.kaggle.com/competitions/jan-2026-dl-gen-ai-project/)  
 
 <p align="center">
   <b>Deep Learning Project | Audio Signal Processing | Music Information Retrieval</b>
@@ -6,124 +7,185 @@
 
 ---
 
-## 🚀 Project Overview
+## 🚀 Live Demo
 
-**Messy Mashup** is a deep learning project focused on robust music genre classification under realistic and noisy mixing conditions.
+👉 **Try the deployed model here:**  
+🔗 https://huggingface.co/spaces/sahilalam75/dl-project-audio-classification  
 
-Unlike traditional clean-track classification, this challenge requires models to generalize across:
+Upload an audio clip and get instant genre predictions.
+
+---
+
+## 📌 Project Overview
+
+**Messy Mashup** is a deep learning project focused on **robust music genre classification under noisy and complex real-world conditions**.
+
+Unlike traditional clean-track classification, this project tackles:
 
 - Cross-song stem recombination  
-- Tempo synchronization adjustments  
-- Instrument balance variations  
-- Additive environmental and synthetic noise  
+- Tempo synchronization distortions  
+- Instrument-level mixing variations  
+- Heavy environmental noise injection  
 
-The objective is to accurately predict the genre of noisy mashup tracks using robust audio representation learning techniques.
+The goal is to build a model that **generalizes well despite extreme domain shifts**.
 
 ---
 
 ## 🎯 Problem Statement
 
-The training data consists of clean instrument-separated stems from 10 genres.  
-The test set contains **noisy mashups** created by:
+- Training Data: Clean, instrument-separated stems (drums, vocals, bass, other)  
+- Test Data: Noisy mashups created by:
+  - Mixing stems from different songs  
+  - Applying tempo alignment  
+  - Adding environmental noise  
 
-- Mixing stems from different songs of the same genre  
-- Applying tempo adjustments for rhythmic alignment  
-- Adding environmental noise samples  
-
-The goal is:
-
-> **Predict the correct genre label for each mashup track.**
+> 🎯 **Objective:** Predict the correct genre label for each mashup track.
 
 ---
 
 ## 📊 Evaluation Metric
 
-Submissions are evaluated using **Macro F1 Score** across 10 genre classes.
-
-- F1 score computed independently per genre  
-- Averaged equally  
-- Robust to class imbalance  
-
-Higher Macro F1 indicates better overall classification performance.
+- **Macro F1 Score**
+  - Computed per class  
+  - Averaged equally across 10 genres  
+  - Robust to class imbalance  
 
 ---
 
-# 📂 Dataset Structure
-<code>messy_mashup/
+## 📂 Dataset Structure
+
+```
+messy_mashup/
 ├── ESC-50-master/    # Environmental noise dataset
-├── genres_stems/     # Clean instrument-separated training data
-├── mashups/          # Noisy test mashups (3020 files)
+├── genres_stems/     # Clean training stems
+├── mashups/          # Noisy test data (3020 files)
 ├── sample_submission.csv
 └── test.csv
-</code>
+```
 
 ---
 
-## 🎼 Training Data — `genres_stems/`
+## 🎼 Genres
 
-- 10 genres  
-- 100 songs per genre  
-- Each song split into 4 stems:
-    1. drums.wav
-    2. vocals.wav
-    3. bass.wav
-    4. other.wav
-
-
-### 🎵 Genres Included
-
-1. blues
-2. classical
-3. country
-4. disco
-5. hiphop
-6. jazz
-7. metal
-8. pop
-9. reggae
-10. rock
-
-These clean stems allow learning genre-specific musical structure at the instrument level.
+- blues  
+- classical  
+- country  
+- disco  
+- hiphop  
+- jazz  
+- metal  
+- pop  
+- reggae  
+- rock  
 
 ---
 
-## 🔊 Noise Dataset — `ESC-50-master/`
+## ⚙️ Preprocessing Pipeline
 
-- 2,000 environmental sound clips  
-- 50 labeled sound classes  
-- Used for noise augmentation and robustness training  
+### Key Challenges
+- Sampling rate mismatch (44.1kHz → 22.05kHz)
+- Loudness differences (RMS shift)
+- Silence in training vs continuous test audio
+- Domain gap between clean stems and noisy mashups
+
+### Final Pipeline
+
+1. **Random Stem Mixing**
+   - Combine drums, bass, vocals, other from different songs
+
+2. **Downsampling**
+   - Convert all audio → **16kHz**
+
+3. **Gain Augmentation**
+   - Random scaling per stem
+
+4. **Cropping**
+   - Train: Random 5s crop  
+   - Validation: Center crop  
+
+5. **Noise Injection**
+   - 30% probability using ESC-50
+
+6. **Normalization**
+   ```
+   y = y / (max(|y|) + 1e-9)
+   ```
+
+7. **Feature Extraction**
+   - Log-Mel Spectrogram
+
+---
+
+## 🧠 Models Implemented
+
+### 🔹 Transfer Learning Models
+- ResNet18 (partial freeze)
+- ResNet18 (fully unfrozen)
+- **ResNet50 (best performing)**
+- EfficientNet
+
+### 🔹 Custom CNN (ScratchCNN)
+- Multi-block Conv2D architecture  
+- BatchNorm + ReLU + MaxPooling + Dropout  
+- AdaptiveAvgPool2d for dimensionality reduction  
 
 ---
 
-## 🎚 Test Set — `mashups/`
+## 🏆 Best Model
 
-- 3,020 unlabeled audio files  
-- Each mashup is created by:
-
-  - Selecting stems from different songs of the same genre  
-  - Applying tempo synchronization  
-  - Mixing stems into a single audio track  
-  - Adding one or more random noise samples  
-
-These mashups are intentionally noisy and musically varied, making genre classification significantly more challenging.
+| Model        | Macro F1 | Notes |
+|-------------|--------|------|
+| **ResNet50_1** | **0.9096** | Best performance |
+| ResNet_2     | 0.9091 | Fully unfrozen |
+| EfficientNet | 0.8764 | Fast & balanced |
+| ScratchCNN   | 0.8555 | Lightweight |
 
 ---
 
-## 📤 Submission Format
+## 🔍 Inference Strategy
 
-Required CSV structure:
-
-<code>id,genre
-0001,blues
-0002,classical
-0003,country</code>
+- Split audio into **5-second windows**
+- Predict each segment
+- **Average probabilities** across segments
 
 ---
 
-## 📦 Dataset Summary
+## 📈 Key Insights
 
-- Total Dataset Size: ~25.88 GB
-- Training Stem Files: 4000
-- Test Mashups: 3020
+- Treating spectrograms as images works extremely well  
+- Transfer learning > training from scratch  
+- Data preprocessing & augmentation were critical  
+- Bridging the domain gap was the biggest challenge  
 
 ---
+
+## ⚡ Tech Stack
+
+- PyTorch (torch, torchvision, torchaudio)  
+- NumPy  
+- Pandas  
+- Librosa  
+- Scikit-learn  
+- Matplotlib & Seaborn  
+- Weights & Biases (wandb)  
+- Huggingface & Gradio (deployment)   
+
+---
+
+## 📦 Requirements
+
+See `requirements.txt` for exact dependency versions.
+
+---
+
+## 📜 Report
+
+Full project report included in the repository.
+
+---
+
+## 🧠 Final Thought
+
+This project shows that:
+
+> *A strong data pipeline + transfer learning can outperform complex architectures trained from scratch.*
