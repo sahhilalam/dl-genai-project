@@ -9,8 +9,7 @@
 
 ## 🚀 Live Demo
 
-👉 **Try the deployed model here:**  
-🔗 https://huggingface.co/spaces/sahilalam75/dl-project-audio-classification  
+👉 **Try the deployed model here:**  [🔗](https://huggingface.co/spaces/sahilalam75/dl-project-audio-classification)
 
 Upload an audio clip and get instant genre predictions.
 
